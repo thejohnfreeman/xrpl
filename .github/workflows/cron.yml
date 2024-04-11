@@ -1,0 +1,32 @@
+name: check for new tags
+on:
+  workflow_dispatch:
+  schedule:
+    # Every day at 1 am UTC (8 pm CST).
+    - cron: '0 1 * * *'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: trigger manual workflow
+        run: |
+          tags=$(
+              git ls-remote --tags --sort version:refname https://github.com/xrplf/rippled \
+              | tail -2 | awk '{ print $2 }'
+          )
+          for tag in ${tags}; do
+              if git ls-remote --tags --exit-code origin ${tag}; then continue; fi
+              wfid=release.yml
+              cat >body.json <<EOF
+              {"ref":"master","inputs":{"tag":"${tag}"}}
+              EOF
+              curl -L -X POST \
+                  -H "Accept: application/vnd.github.v3+json" \
+                  -H "Authorization: Bearer ${{ github.token }}" \
+                  -H "X-GitHub-Api-Version: 2022-11-28" \
+                  -d @body.json \
+                  "${{ github.api_url }}/repos/${{ github.repository }}/actions/workflows/${wfid}/dispatches"
+          done
