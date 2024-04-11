@@ -9,21 +9,27 @@ jobs:
   check:
     runs-on: ubuntu-latest
     permissions:
+      # To trigger another workflow.
       actions: write
     steps:
-      - name: trigger manual workflow
+      - name: trigger release workflow
         run: |
+          origin=https://github.com/thejohnfreeman/xrpl
+          wfid=release.yml
+          # https://stackoverflow.com/a/25987962/618906
+          # $ git ls-remote --tags
+          # b8f596ee41e6252132576828dfd1fef841df9e14        refs/tags/2.1.1
           tags=$(
               git ls-remote --tags --sort version:refname https://github.com/xrplf/rippled \
               | tail -2 | awk '{ print $2 }' | awk 'BEGIN { FS="/" } { print $3 }'
           )
-          origin=https://github.com/thejohnfreeman/xrpl
           for tag in ${tags}; do
               if git ls-remote --tags --exit-code "${origin}" ${tag}; then continue; fi
-              wfid=release.yml
+          # Must de-dent heredoc so that line starts with delimiter.
               cat >body.json <<EOF
           {"ref":"master","inputs":{"tag":"${tag}"}}
           EOF
+              # https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
               curl -L -X POST \
                   -H "Accept: application/vnd.github.v3+json" \
                   -H "Authorization: Bearer ${{ github.token }}" \
