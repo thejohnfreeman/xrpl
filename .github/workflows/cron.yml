@@ -15,10 +15,11 @@ jobs:
         run: |
           tags=$(
               git ls-remote --tags --sort version:refname https://github.com/xrplf/rippled \
-              | tail -2 | awk '{ print $2 }'
+              | tail -2 | awk '{ print $2 }' | awk 'BEGIN { FS="/" } { print $3 }'
           )
+          origin=https://github.com/thejohnfreeman/xrpl
           for tag in ${tags}; do
-              if git ls-remote --tags --exit-code origin ${tag}; then continue; fi
+              if git ls-remote --tags --exit-code "${origin}" ${tag}; then continue; fi
               wfid=release.yml
               cat >body.json <<EOF
           {"ref":"master","inputs":{"tag":"${tag}"}}
