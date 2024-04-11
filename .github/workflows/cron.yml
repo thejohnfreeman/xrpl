@@ -21,8 +21,8 @@ jobs:
               if git ls-remote --tags --exit-code origin ${tag}; then continue; fi
               wfid=release.yml
               cat >body.json <<EOF
-              {"ref":"master","inputs":{"tag":"${tag}"}}
-              EOF
+          {"ref":"master","inputs":{"tag":"${tag}"}}
+          EOF
               curl -L -X POST \
                   -H "Accept: application/vnd.github.v3+json" \
                   -H "Authorization: Bearer ${{ github.token }}" \
