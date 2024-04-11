@@ -1,7 +1,7 @@
 xrpl
 ====
 
-Redirectory storage for the Conan package `xrpl`.
+[Redirectory][] storage for the Conan package [`xrpl`][xrpl].
 
 ```
 # Some dependency packages cannot come from Conan Center.
@@ -10,3 +10,6 @@ conan remote add github https://conan.jfreeman.dev
 conan search --remote github xrpl
 conan install --remote github --build missing xrpl/2.1.1@github/thejohnfreeman
 ```
+
+[Redirectory]: https://conan.jfreeman.dev
+[xrpl]: https://github.com/XRPLF/rippled
